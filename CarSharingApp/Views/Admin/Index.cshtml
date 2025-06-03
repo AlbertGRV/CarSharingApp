@@ -1,0 +1,212 @@
+@{
+    ViewData["Title"] = "Админ-панель";
+    var stats = ViewBag.Stats;
+    var recentBookings = ViewBag.RecentBookings as List<CarSharingApp.Models.Booking>;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-shield-check text-danger"></i> Админ-панель</h1>
+    <div class="text-end">
+        <span class="badge bg-danger">Администратор</span>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <i class="bi bi-people" style="font-size: 2rem;"></i>
+                <h3 class="mt-2">@stats.TotalUsers</h3>
+                <p class="mb-0">Пользователей</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <i class="bi bi-car-front" style="font-size: 2rem;"></i>
+                <h3 class="mt-2">@stats.TotalCars</h3>
+                <p class="mb-0">Автомобилей</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <i class="bi bi-check-circle" style="font-size: 2rem;"></i>
+                <h3 class="mt-2">@stats.AvailableCars</h3>
+                <p class="mb-0">Доступно</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body text-center">
+                <i class="bi bi-clock" style="font-size: 2rem;"></i>
+                <h3 class="mt-2">@stats.ActiveBookings</h3>
+                <p class="mb-0">Активных</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card bg-secondary text-white">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-day" style="font-size: 2rem;"></i>
+                <h3 class="mt-2">@stats.TodayRevenue.ToString("C0")</h3>
+                <p class="mb-0">За сегодня</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card bg-dark text-white">
+            <div class="card-body text-center">
+                <i class="bi bi-wallet" style="font-size: 2rem;"></i>
+                <h3 class="mt-2">@stats.TotalRevenue.ToString("C0")</h3>
+                <p class="mb-0">Всего</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-lightning"></i> Быстрые действия</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a asp-action="CreateCar" class="btn btn-success w-100">
+                            <i class="bi bi-plus-circle"></i> Добавить автомобиль
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a asp-action="Cars" class="btn btn-primary w-100">
+                            <i class="bi bi-car-front"></i> Управление автопарком
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a asp-action="Users" class="btn btn-info w-100">
+                            <i class="bi bi-people"></i> Пользователи
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a asp-action="Bookings" class="btn btn-warning w-100">
+                            <i class="bi bi-calendar-check"></i> Бронирования
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Bookings -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Последние бронирования</h5>
+            </div>
+            <div class="card-body">
+                @if (recentBookings.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Пользователь</th>
+                                    <th>Автомобиль</th>
+                                    <th>Дата начала</th>
+                                    <th>Продолжительность</th>
+                                    <th>Стоимость</th>
+                                    <th>Статус</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var booking in recentBookings)
+                                {
+                                    <tr>
+                                        <td><span class="badge bg-secondary">#@booking.Id</span></td>
+                                        <td>
+                                            <strong>@booking.User.FirstName @booking.User.LastName</strong><br>
+                                            <small class="text-muted">@booking.User.Email</small>
+                                        </td>
+                                        <td>
+                                            <strong>@booking.Car.Brand @booking.Car.Model</strong><br>
+                                            <small class="text-muted">@booking.Car.LicensePlate</small>
+                                        </td>
+                                        <td>@booking.StartTime.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>
+                                            @if (booking.ActualDurationMinutes.HasValue)
+                                            {
+                                                <span>@booking.ActualDurationMinutes мин</span>
+                                            }
+                                            else if (booking.PlannedDurationMinutes.HasValue)
+                                            {
+                                                <span class="text-muted">~@booking.PlannedDurationMinutes мин</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (booking.TotalCost.HasValue)
+                                            {
+                                                <span class="fw-bold">@booking.TotalCost.Value.ToString("C")</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">В процессе</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @switch (booking.Status)
+                                            {
+                                                case CarSharingApp.Models.BookingStatus.Active:
+                                                    <span class="badge bg-warning">Активно</span>
+                                                    break;
+                                                case CarSharingApp.Models.BookingStatus.Completed:
+                                                    <span class="badge bg-success">Завершено</span>
+                                                    break;
+                                                case CarSharingApp.Models.BookingStatus.Cancelled:
+                                                    <span class="badge bg-danger">Отменено</span>
+                                                    break;
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-primary" title="Подробнее">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                @if (booking.Status == CarSharingApp.Models.BookingStatus.Active)
+                                                {
+                                                    <button class="btn btn-outline-danger" title="Завершить">
+                                                        <i class="bi bi-stop-circle"></i>
+                                                    </button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4">
+                        <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3 text-muted">Бронирований пока нет</h5>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

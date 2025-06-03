@@ -1,0 +1,286 @@
+@model CarSharingApp.Models.Car
+
+@{
+    ViewData["Title"] = $"{Model.Brand} {Model.Model}";
+}
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Car Image -->
+        <div class="card mb-4">
+            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+                <i class="bi bi-car-front text-muted" style="font-size: 8rem;"></i>
+            </div>
+        </div>
+
+        <!-- Car Details -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="bi bi-info-circle"></i> Характеристики автомобиля
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Марка:</strong></td>
+                                <td>@Model.Brand</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Модель:</strong></td>
+                                <td>@Model.Model</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Год выпуска:</strong></td>
+                                <td>@Model.Year</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Цвет:</strong></td>
+                                <td>@Model.Color</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Номерной знак:</strong></td>
+                                <td><span class="badge bg-dark">@Model.LicensePlate</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Тип топлива:</strong></td>
+                                <td>
+                                    @switch (Model.FuelType)
+                                    {
+                                        case CarSharingApp.Models.FuelType.Gasoline:
+                                            <span class="badge bg-warning">Бензин</span>
+                                            break;
+                                        case CarSharingApp.Models.FuelType.Diesel:
+                                            <span class="badge bg-info">Дизель</span>
+                                            break;
+                                        case CarSharingApp.Models.FuelType.Electric:
+                                            <span class="badge bg-success">Электро</span>
+                                            break;
+                                        case CarSharingApp.Models.FuelType.Hybrid:
+                                            <span class="badge bg-primary">Гибрид</span>
+                                            break;
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Коробка передач:</strong></td>
+                                <td>@(Model.TransmissionType == CarSharingApp.Models.TransmissionType.Automatic ? "Автоматическая" : "Механическая")</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Количество мест:</strong></td>
+                                <td>@Model.SeatsCount</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Пробег:</strong></td>
+                                <td>@Model.Mileage.ToString("N0") км</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Уровень топлива:</strong></td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-success" style="width: @Model.FuelLevel%">
+                                            @Model.FuelLevel%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <hr>
+                    <h5>Описание</h5>
+                    <p>@Model.Description</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Booking Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-calendar-check"></i> Бронирование
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <h2 class="text-primary">@Model.PricePerMinute.ToString("C")</h2>
+                    <small class="text-muted">за минуту</small>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Статус:</span>
+                        <span class="badge bg-success">@Model.Status</span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Местоположение:</span>
+                        <small class="text-muted">@Model.Address</small>
+                    </div>
+                </div>
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    @if (Model.Status == CarSharingApp.Models.CarStatus.Available)
+                    {
+                        <form asp-action="Book" method="post">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Планируемая продолжительность</label>
+                                <select class="form-select" name="plannedDuration" required>
+                                    <option value="">Выберите время</option>
+                                    <option value="30">30 минут (~@((Model.PricePerMinute * 30).ToString("C")))</option>
+                                    <option value="60">1 час (~@((Model.PricePerMinute * 60).ToString("C")))</option>
+                                    <option value="120">2 часа (~@((Model.PricePerMinute * 120).ToString("C")))</option>
+                                    <option value="180">3 часа (~@((Model.PricePerMinute * 180).ToString("C")))</option>
+                                    <option value="360">6 часов (~@((Model.PricePerMinute * 360).ToString("C")))</option>
+                                    <option value="720">12 часов (~@((Model.PricePerMinute * 720).ToString("C")))</option>
+                                    <option value="1440">24 часа (~@((Model.PricePerMinute * 1440).ToString("C")))</option>
+                                </select>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-calendar-plus"></i> Забронировать
+                                </button>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Автомобиль недоступен для бронирования
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <p class="mb-2">Для бронирования необходимо войти в систему</p>
+                        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary w-100">
+                            <i class="bi bi-box-arrow-in-right"></i> Войти
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Location Card -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-geo-alt"></i> Местоположение
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-2"><strong>Адрес:</strong> @Model.Address</p>
+                @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+                {
+                    <p class="mb-3">
+                        <strong>Координаты:</strong> 
+                        @Model.Latitude.Value.ToString("F6"), @Model.Longitude.Value.ToString("F6")
+                    </p>
+                }
+                <div class="bg-light p-3 rounded text-center">
+                    <i class="bi bi-map text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-2 mb-0">Карта будет здесь</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Bookings -->
+@if (Model.Bookings.Any())
+{
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history"></i> История бронирований
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Пользователь</th>
+                                    <th>Дата начала</th>
+                                    <th>Продолжительность</th>
+                                    <th>Стоимость</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var booking in Model.Bookings.OrderByDescending(b => b.StartTime).Take(5))
+                                {
+                                    <tr>
+                                        <td>@booking.User.FirstName @booking.User.LastName</td>
+                                        <td>@booking.StartTime.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>
+                                            @if (booking.ActualDurationMinutes.HasValue)
+                                            {
+                                                <span>@booking.ActualDurationMinutes мин</span>
+                                            }
+                                            else if (booking.PlannedDurationMinutes.HasValue)
+                                            {
+                                                <span class="text-muted">~@booking.PlannedDurationMinutes мин</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (booking.TotalCost.HasValue)
+                                            {
+                                                <span>@booking.TotalCost.Value.ToString("C")</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @switch (booking.Status)
+                                            {
+                                                case CarSharingApp.Models.BookingStatus.Active:
+                                                    <span class="badge bg-warning">Активно</span>
+                                                    break;
+                                                case CarSharingApp.Models.BookingStatus.Completed:
+                                                    <span class="badge bg-success">Завершено</span>
+                                                    break;
+                                                case CarSharingApp.Models.BookingStatus.Cancelled:
+                                                    <span class="badge bg-danger">Отменено</span>
+                                                    break;
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="mt-4">
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Назад к списку автомобилей
+    </a>
+</div>

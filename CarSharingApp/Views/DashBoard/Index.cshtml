@@ -1,0 +1,257 @@
+@{
+    ViewData["Title"] = "Мои поездки";
+    var activeBooking = ViewBag.ActiveBooking as CarSharingApp.Models.Booking;
+    var recentBookings = ViewBag.RecentBookings as List<CarSharingApp.Models.Booking>;
+    var nearbyCars = ViewBag.NearbyCars as List<CarSharingApp.Models.Car>;
+    var user = ViewBag.User as CarSharingApp.Models.ApplicationUser;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-speedometer2"></i> Личный кабинет</h1>
+    <div class="text-end">
+        <h5 class="mb-0">Добро пожаловать, @user.FirstName!</h5>
+        <small class="text-muted">@user.Email</small>
+    </div>
+</div>
+
+<!-- Active Booking -->
+@if (activeBooking != null)
+{
+    <div class="alert alert-success border-success mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h4 class="alert-heading">
+                    <i class="bi bi-car-front"></i> Активная поездка
+                </h4>
+                <p class="mb-2">
+                    <strong>@activeBooking.Car.Brand @activeBooking.Car.Model</strong> 
+                    (@activeBooking.Car.LicensePlate)
+                </p>
+                <p class="mb-2">
+                    <i class="bi bi-clock"></i> Начало: @activeBooking.StartTime.ToString("dd.MM.yyyy HH:mm")
+                </p>
+                <p class="mb-0">
+                    <i class="bi bi-geo-alt"></i> @activeBooking.Car.Address
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#endTripModal">
+                    <i class="bi bi-stop-circle"></i> Завершить поездку
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- End Trip Modal -->
+    <div class="modal fade" id="endTripModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form asp-action="EndTrip" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Завершение поездки</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="bookingId" value="@activeBooking.Id" />
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Конечный пробег (км)</label>
+                            <input type="number" class="form-control" name="endMileage" 
+                                   value="@activeBooking.Car.Mileage" min="@activeBooking.Car.Mileage" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Уровень топлива (%)</label>
+                            <input type="number" class="form-control" name="endFuelLevel" 
+                                   value="@activeBooking.Car.FuelLevel" min="0" max="100" required>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <small>
+                                <i class="bi bi-info-circle"></i>
+                                Стоимость будет рассчитана автоматически на основе времени поездки
+                            </small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-danger">Завершить поездку</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Statistics -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-car-front text-primary" style="font-size: 2rem;"></i>
+                <h3 class="mt-2">@ViewBag.TotalTrips</h3>
+                <p class="text-muted mb-0">Всего поездок</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-clock text-success" style="font-size: 2rem;"></i>
+                <h3 class="mt-2">@ViewBag.TotalTimeHours ч</h3>
+                <p class="text-muted mb-0">Время в пути</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-wallet text-warning" style="font-size: 2rem;"></i>
+                <h3 class="mt-2">@ViewBag.TotalCost.ToString("C")</h3>
+                <p class="text-muted mb-0">Потрачено</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="bi bi-star text-info" style="font-size: 2rem;"></i>
+                <h3 class="mt-2">4.8</h3>
+                <p class="text-muted mb-0">Ваш рейтинг</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Bookings -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock-history"></i> Последние поездки
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (recentBookings.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Автомобиль</th>
+                                    <th>Дата</th>
+                                    <th>Время</th>
+                                    <th>Стоимость</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var booking in recentBookings)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@booking.Car.Brand @booking.Car.Model</strong><br>
+                                            <small class="text-muted">@booking.Car.LicensePlate</small>
+                                        </td>
+                                        <td>@booking.StartTime.ToString("dd.MM.yyyy")</td>
+                                        <td>
+                                            @if (booking.ActualDurationMinutes.HasValue)
+                                            {
+                                                <span>@booking.ActualDurationMinutes мин</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">В процессе</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (booking.TotalCost.HasValue)
+                                            {
+                                                <span class="fw-bold">@booking.TotalCost.Value.ToString("C")</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @switch (booking.Status)
+                                            {
+                                                case CarSharingApp.Models.BookingStatus.Active:
+                                                    <span class="badge bg-warning">Активно</span>
+                                                    break;
+                                                case CarSharingApp.Models.BookingStatus.Completed:
+                                                    <span class="badge bg-success">Завершено</span>
+                                                    break;
+                                                case CarSharingApp.Models.BookingStatus.Cancelled:
+                                                    <span class="badge bg-danger">Отменено</span>
+                                                    break;
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4">
+                        <i class="bi bi-car-front text-muted" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3 text-muted">Поездок пока нет</h5>
+                        <p class="text-muted">Забронируйте свой первый автомобиль!</p>
+                        <a asp-controller="Cars" asp-action="Index" class="btn btn-primary">
+                            <i class="bi bi-car-front"></i> Выбрать автомобиль
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Nearby Cars -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-geo-alt"></i> Ближайшие автомобили
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (nearbyCars.Any())
+                {
+                    @foreach (var car in nearbyCars)
+                    {
+                        <div class="d-flex align-items-center mb-3 p-2 border rounded">
+                            <div class="me-3">
+                                <i class="bi bi-car-front text-primary" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">@car.Brand @car.Model</h6>
+                                <small class="text-muted">@car.Address</small>
+                                <div class="d-flex justify-content-between align-items-center mt-1">
+                                    <span class="text-primary fw-bold">@car.PricePerMinute.ToString("C")/мин</span>
+                                    <a asp-controller="Cars" asp-action="Details" asp-route-id="@car.Id" 
+                                       class="btn btn-sm btn-outline-primary">Выбрать</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div class="d-grid">
+                        <a asp-controller="Cars" asp-action="Index" class="btn btn-outline-primary">
+                            Показать все автомобили
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-3">
+                        <i class="bi bi-car-front text-muted" style="font-size: 2rem;"></i>
+                        <p class="text-muted mt-2 mb-0">Нет доступных автомобилей</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

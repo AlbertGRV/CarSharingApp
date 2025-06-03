@@ -1,0 +1,183 @@
+@{
+    ViewData["Title"] = "Главная";
+}
+
+<!-- Главный баннер -->
+<div class="hero-section bg-primary text-white py-5 mb-4">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="display-4 fw-bold">CarShare</h1>
+                <p class="lead">Аренда автомобилей в любой точке города</p>
+                <p>Забронируйте автомобиль прямо сейчас и отправляйтесь в путь!</p>
+                <a asp-controller="Cars" asp-action="Index" class="btn btn-light btn-lg">Найти автомобиль</a>
+            </div>
+            <div class="col-md-6 text-center">
+                <img src="https://via.placeholder.com/500x300?text=CarShare" class="img-fluid rounded" alt="CarShare">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Секция с преимуществами -->
+    <div class="row mb-5">
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="display-4 mb-3 text-primary">⏱️</div>
+                    <h3>Быстрая аренда</h3>
+                    <p>Бронирование занимает менее 5 минут. Получите автомобиль в любое время суток.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="display-4 mb-3 text-primary">💰</div>
+                    <h3>Выгодные тарифы</h3>
+                    <p>Оплачивайте только время использования. Без скрытых платежей и комиссий.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="display-4 mb-3 text-primary">🔒</div>
+                    <h3>Безопасность</h3>
+                    <p>Все автомобили регулярно проходят техническое обслуживание и страхование.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Секция с популярными автомобилями -->
+    <h2 class="mb-4">Популярные автомобили</h2>
+    <div class="row mb-5">
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm">
+                <img src="https://via.placeholder.com/300x200?text=Toyota+Camry" class="card-img-top" alt="Toyota Camry">
+                <div class="card-body">
+                    <h5 class="card-title">Toyota Camry</h5>
+                    <p class="card-text text-muted">Комфортный седан для деловых поездок</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-primary fw-bold">300 ₽/час</span>
+                        <a href="#" class="btn btn-outline-primary">Забронировать</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm">
+                <img src="https://via.placeholder.com/300x200?text=Volkswagen+Polo" class="card-img-top" alt="Volkswagen Polo">
+                <div class="card-body">
+                    <h5 class="card-title">Volkswagen Polo</h5>
+                    <p class="card-text text-muted">Экономичный городской автомобиль</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-primary fw-bold">250 ₽/час</span>
+                        <a href="#" class="btn btn-outline-primary">Забронировать</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm">
+                <img src="https://via.placeholder.com/300x200?text=BMW+X5" class="card-img-top" alt="BMW X5">
+                <div class="card-body">
+                    <h5 class="card-title">BMW X5</h5>
+                    <p class="card-text text-muted">Премиальный внедорожник</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-primary fw-bold">500 ₽/час</span>
+                        <a href="#" class="btn btn-outline-primary">Забронировать</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Секция с инструкцией -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card bg-light border-0">
+                <div class="card-body">
+                    <h2 class="text-center mb-4">Как это работает</h2>
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <div class="display-4 mb-2">1</div>
+                            <h5>Регистрация</h5>
+                            <p>Создайте аккаунт и загрузите документы</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="display-4 mb-2">2</div>
+                            <h5>Поиск</h5>
+                            <p>Выберите подходящий автомобиль на карте</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="display-4 mb-2">3</div>
+                            <h5>Бронирование</h5>
+                            <p>Забронируйте и оплатите онлайн</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="display-4 mb-2">4</div>
+                            <h5>Поездка</h5>
+                            <p>Откройте автомобиль через приложение и поезжайте</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Секция с отзывами -->
+    <h2 class="mb-4">Отзывы клиентов</h2>
+    <div class="row mb-5">
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="mb-2">⭐⭐⭐⭐⭐</div>
+                    <p class="card-text">"Отличный сервис! Быстро забронировал машину и через 10 минут уже был в пути. Рекомендую!"</p>
+                    <p class="card-text"><small class="text-muted">Алексей, Москва</small></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="mb-2">⭐⭐⭐⭐⭐</div>
+                    <p class="card-text">"Удобное приложение, чистые автомобили и отзывчивая поддержка. Пользуюсь регулярно."</p>
+                    <p class="card-text"><small class="text-muted">Елена, Санкт-Петербург</small></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="mb-2">⭐⭐⭐⭐</div>
+                    <p class="card-text">"Выгодные тарифы и большой выбор автомобилей. Единственный минус - иногда нет машин рядом."</p>
+                    <p class="card-text"><small class="text-muted">Дмитрий, Казань</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Секция с призывом к действию -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center py-5">
+                    <h2 class="mb-3">Готовы начать?</h2>
+                    <p class="lead mb-4">Зарегистрируйтесь сейчас и получите 30 минут бесплатной поездки!</p>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a asp-controller="Cars" asp-action="Index" class="btn btn-light btn-lg">Найти автомобиль</a>
+                    }
+                    else
+                    {
+                        <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-light btn-lg me-2">Регистрация</a>
+                        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-light btn-lg">Вход</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

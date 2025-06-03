@@ -1,0 +1,196 @@
+@{
+    ViewData["Title"] = "Личный кабинет";
+    var user = ViewBag.User as ApplicationUser;
+    var activeBookings = ViewBag.ActiveBookings as List<Booking>;
+    var bookingHistory = ViewBag.BookingHistory as List<Booking>;
+}
+
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="display-1 me-3">👤</div>
+                        <div>
+                            <h1 class="mb-0">Добро пожаловать, @user.UserName!</h1>
+                            <p class="mb-0">Ваш личный кабинет в системе CarShare</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Мой профиль</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Email:</strong> @user.Email
+                    </div>
+                    <div class="mb-3">
+                        <strong>Имя пользователя:</strong> @user.UserName
+                    </div>
+                    <div class="mb-3">
+                        <strong>Дата регистрации:</strong> @user.CreatedAt.ToString("dd.MM.yyyy")
+                    </div>
+                    <a asp-action="Profile" class="btn btn-outline-primary">Редактировать профиль</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Активные бронирования</h5>
+                </div>
+                <div class="card-body">
+                    @if (activeBookings != null && activeBookings.Any())
+                    {
+                        <ul class="list-group">
+                            @foreach (var booking in activeBookings)
+                            {
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>@booking.Car.Brand @booking.Car.Model</strong>
+                                            <div>@booking.StartDate.ToString("dd.MM HH:mm") - @booking.EndDate.ToString("dd.MM HH:mm")</div>
+                                        </div>
+                                        <a asp-action="BookingDetails" asp-route-id="@booking.Id" class="btn btn-sm btn-primary">Детали</a>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            У вас нет активных бронирований
+                        </div>
+                    }
+                    <div class="mt-3">
+                        <a asp-action="Bookings" class="btn btn-outline-warning">Все бронирования</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Быстрые действия</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Cars" asp-action="Index" class="btn btn-primary">Забронировать автомобиль</a>
+                        <a asp-action="Bookings" class="btn btn-outline-secondary">История поездок</a>
+                        <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-outline-secondary">Настройки аккаунта</a>
+                        <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="btn btn-outline-secondary">Изменить пароль</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">История поездок</h5>
+                </div>
+                <div class="card-body">
+                    @if (bookingHistory != null && bookingHistory.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Автомобиль</th>
+                                        <th>Дата</th>
+                                        <th>Статус</th>
+                                        <th>Стоимость</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var booking in bookingHistory)
+                                    {
+                                        <tr>
+                                            <td>@booking.Car.Brand @booking.Car.Model</td>
+                                            <td>@booking.StartDate.ToString("dd.MM.yyyy")</td>
+                                            <td>
+                                                @if (booking.Status == "Завершено")
+                                                {
+                                                    <span class="badge bg-success">Завершено</span>
+                                                }
+                                                else if (booking.Status == "Отменено")
+                                                {
+                                                    <span class="badge bg-danger">Отменено</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">@booking.Status</span>
+                                                }
+                                            </td>
+                                            <td>@booking.TotalCost ₽</td>
+                                            <td>
+                                                <a asp-action="BookingDetails" asp-route-id="@booking.Id" class="btn btn-sm btn-outline-primary">Детали</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-3">
+                            <a asp-action="Bookings" class="btn btn-outline-secondary">Показать все</a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            У вас пока нет истории поездок
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Статистика</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Всего поездок:</span>
+                            <strong>@(activeBookings?.Count() + bookingHistory?.Count() ?? 0)</strong>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Активных бронирований:</span>
+                            <strong>@(activeBookings?.Count() ?? 0)</strong>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Завершенных поездок:</span>
+                            <strong>@(bookingHistory?.Count(b => b.Status == "Завершено") ?? 0)</strong>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Отмененных бронирований:</span>
+                            <strong>@(bookingHistory?.Count(b => b.Status == "Отменено") ?? 0)</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

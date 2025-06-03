@@ -1,0 +1,145 @@
+@model IEnumerable<CarSharingApp.Models.Car>
+
+@{
+    ViewData["Title"] = "Автомобили";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-car-front"></i> Доступные автомобили</h1>
+    <span class="badge bg-primary fs-6">@Model.Count() автомобилей</span>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Поиск</label>
+                <input type="text" class="form-control" name="search" value="@ViewBag.Search"
+                       placeholder="Марка, модель, цвет...">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Топливо</label>
+                <select class="form-select" name="fuelType">
+                    <option value="">Все</option>
+                    <option value="0" selected="@(ViewBag.FuelType?.ToString() == "Gasoline")">Бензин</option>
+                    <option value="1" selected="@(ViewBag.FuelType?.ToString() == "Diesel")">Дизель</option>
+                    <option value="2" selected="@(ViewBag.FuelType?.ToString() == "Electric")">Электро</option>
+                    <option value="3" selected="@(ViewBag.FuelType?.ToString() == "Hybrid")">Гибрид</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Коробка</label>
+                <select class="form-select" name="transmission">
+                    <option value="">Все</option>
+                    <option value="0" selected="@(ViewBag.Transmission?.ToString() == "Manual")">Механика</option>
+                    <option value="1" selected="@(ViewBag.Transmission?.ToString() == "Automatic")">Автомат</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Сортировка</label>
+                <select class="form-select" name="sortBy">
+                    <option value="" selected="@(ViewBag.SortBy == "")">По умолчанию</option>
+                    <option value="price_asc" selected="@(ViewBag.SortBy == "price_asc")">Цена: по возрастанию</option>
+                    <option value="price_desc" selected="@(ViewBag.SortBy == "price_desc")">Цена: по убыванию</option>
+                    <option value="year_desc" selected="@(ViewBag.SortBy == "year_desc")">Год: новые первыми</option>
+                    <option value="brand" selected="@(ViewBag.SortBy == "brand")">По марке</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Найти
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Cars Grid -->
+<div class="row">
+    @foreach (var car in Model)
+    {
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="position-relative">
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-car-front text-muted" style="font-size: 4rem;"></i>
+                    </div>
+                    <span class="position-absolute top-0 end-0 m-2 badge bg-success">
+                        Доступен
+                    </span>
+                </div>
+
+                <div class="card-body">
+                    <h5 class="card-title">@car.Brand @car.Model</h5>
+                    <p class="card-text text-muted mb-2">@car.Year • @car.Color</p>
+
+                    <div class="row text-center mb-3">
+                        <div class="col-4">
+                            <small class="text-muted d-block">Топливо</small>
+                            <span class="fw-bold">
+                                @{
+                                    string fuelTypeText = car.FuelType switch
+                                    {
+                                        CarSharingApp.Models.FuelType.Gasoline => "Бензин",
+                                        CarSharingApp.Models.FuelType.Diesel => "Дизель",
+                                        CarSharingApp.Models.FuelType.Electric => "Электро",
+                                        CarSharingApp.Models.FuelType.Hybrid => "Гибрид",
+                                        _ => "Неизвестно"
+                                    };
+                                }
+                                @fuelTypeText
+                            </span>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted d-block">Коробка</small>
+                            <span class="fw-bold">
+                                @(car.TransmissionType == CarSharingApp.Models.TransmissionType.Automatic ? "Автомат" : "Механика")
+                            </span>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted d-block">Мест</small>
+                            <span class="fw-bold">@car.SeatsCount</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span class="h5 text-primary">@car.PricePerMinute.ToString("C")</span>
+                            <small class="text-muted">/мин</small>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-success">
+                                <i class="bi bi-fuel-pump"></i> @car.FuelLevel%
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="bi bi-geo-alt"></i> @car.Address
+                        </small>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-transparent">
+                    <div class="d-grid">
+                        <a asp-action="Details" asp-route-id="@car.Id" class="btn btn-primary">
+                            <i class="bi bi-eye"></i> Подробнее и бронирование
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5">
+        <i class="bi bi-car-front text-muted" style="font-size: 4rem;"></i>
+        <h3 class="mt-3 text-muted">Автомобили не найдены</h3>
+        <p class="text-muted">Попробуйте изменить параметры поиска</p>
+        <a asp-action="Index" class="btn btn-primary">Сбросить фильтры</a>
+    </div>
+} 
