@@ -1,0 +1,211 @@
+using CarSharingApp.Models.Enums;
+
+@model IEnumerable<Booking>
+
+@if (Model.Any())
+{
+    <div class="row">
+        @foreach (var booking in Model)
+        {
+            <div class="col-lg-6 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <!-- Статус -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="badge @GetStatusBadgeClass(booking.Status)">
+                                @GetStatusText(booking.Status)
+                            </span>
+                            <small class="text-muted">#@booking.Id</small>
+                        </div>
+
+                        <!-- Информация об автомобиле -->
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0">
+                                <img src="@(booking.Car.ImageUrl ?? "/placeholder.svg?height=80&width=120")" 
+                                     alt="@booking.Car.Brand @booking.Car.Model" 
+                                     class="rounded" style="width: 120px; height: 80px; object-fit: cover;">
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="mb-1">@booking.Car.Brand @booking.Car.Model</h5>
+                                <p class="text-muted mb-1">@booking.Car.Color, @booking.Car.Year год</p>
+                                <small class="text-muted">
+                                    <i class="me-1">📍</i>@booking.Car.Address
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Время и стоимость -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <small class="text-muted">Начало</small>
+                                <div class="fw-bold">@booking.StartTime?.ToString("dd.MM.yyyy")</div>
+                                <div class="text-muted">@booking.StartTime?.ToString("HH:mm")</div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Окончание</small>
+                                <div class="fw-bold">@booking.EndTime?.ToString("dd.MM.yyyy")</div>
+                                <div class="text-muted">@booking.EndTime?.ToString("HH:mm")</div>
+                            </div>
+                        </div>
+
+                        <!-- Стоимость -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-muted">Стоимость:</span>
+                            <span class="h5 mb-0 text-primary">@booking.TotalCost?.ToString("N0") ₽</span>
+                        </div>
+
+                        <!-- Действия -->
+                        <div class="d-flex gap-2">
+                            <a asp-action="BookingDetails" asp-route-id="@booking.Id" 
+                               class="btn btn-outline-primary btn-sm flex-grow-1">
+                                <i class="me-1">👁️</i>Детали
+                            </a>
+                            
+                            @if (booking.Status == BookingStatus.Active && booking.StartTime > DateTime.Now)
+                            {
+                                <button type="button" class="btn btn-outline-danger btn-sm" 
+                                        data-bs-toggle="modal" data-bs-target="#cancelModal@(booking.Id)">
+                                    <i class="me-1">❌</i>Отменить
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Дополнительная информация для активных бронирований -->
+                    @if (booking.Status == BookingStatus.Active)
+                    {
+                        <div class="card-footer bg-light border-0">
+                            @if (booking.StartTime <= DateTime.Now && booking.EndTime >= DateTime.Now)
+                            {
+                                <div class="text-center">
+                                    <span class="badge bg-success">🚗 Поездка активна</span>
+                                    <div class="mt-1">
+                                        <small class="text-muted">
+                                            Окончание через: <span id="countdown-@booking.Id"></span>
+                                        </small>
+                                    </div>
+                                </div>
+                            }
+                            else if (booking.StartTime > DateTime.Now)
+                            {
+                                <div class="text-center">
+                                    <span class="badge bg-warning">⏰ Ожидает начала</span>
+                                    <div class="mt-1">
+                                        <small class="text-muted">
+                                            Начало через: <span id="countdown-@booking.Id"></span>
+                                        </small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Модальное окно отмены -->
+            @if (booking.Status == BookingStatus.Active && booking.StartTime > DateTime.Now)
+            {
+                <div class="modal fade" id="cancelModal@(booking.Id)" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Отмена бронирования</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Вы уверены, что хотите отменить бронирование?</p>
+                                <div class="alert alert-info">
+                                    <strong>@booking.Car.Brand @booking.Car.Model</strong><br>
+                                    @booking.StartTime?.ToString("dd.MM.yyyy HH:mm") - @booking.EndTime?.ToString("dd.MM.yyyy HH:mm")<br>
+                                    Стоимость: @booking.TotalCost ₽
+                                </div>
+                                <p class="text-muted small">
+                                    При отмене бронирования средства будут возвращены на ваш счет в течение 3-5 рабочих дней.
+                                </p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                <form asp-action="CancelBooking" asp-route-id="@booking.Id" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-danger">Подтвердить отмену</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+}
+else
+{
+    <div class="text-center py-5">
+        <div class="display-1 text-muted mb-3">📋</div>
+        <h4 class="text-muted">Бронирований не найдено</h4>
+        <p class="text-muted">В этой категории пока нет бронирований</p>
+        <a asp-action="QuickBooking" class="btn btn-primary">
+            <i class="me-2">➕</i>Создать бронирование
+        </a>
+    </div>
+}
+
+@functions {
+    private string GetStatusBadgeClass(BookingStatus status)
+    {
+        return status switch
+        {
+            BookingStatus.Active => "bg-success",
+            BookingStatus.Completed => "bg-secondary",
+            BookingStatus.Cancelled => "bg-danger",
+            // BookingStatus.Pending => "bg-warning",
+            _ => "bg-secondary"
+        };
+    }
+
+    private string GetStatusText(BookingStatus status)
+    {
+        return status switch
+        {
+            BookingStatus.Active => "Активно",
+            BookingStatus.Completed => "Завершено",
+            BookingStatus.Cancelled => "Отменено",
+            // BookingStatus.Pending => "Ожидает",
+            _ => "Неизвестно"
+        };
+    }
+}
+
+@section Scripts {
+    <script>
+        // Обновление таймеров обратного отсчета
+        function updateCountdowns() {
+            @foreach (var booking in Model.Where(b => b.Status == BookingStatus.Active))
+            {
+                <text>
+                var targetDate@(booking.Id) = new Date('@(booking.StartTime > DateTime.Now ? booking.StartTime : booking.EndTime)');
+                var now = new Date();
+                var diff = targetDate@(booking.Id) - now;
+                
+                var element = document.getElementById('countdown-@booking.Id');
+                if (element && diff > 0) {
+                    var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    
+                    var countdownText = '';
+                    if (days > 0) countdownText += days + ' д. ';
+                    countdownText += hours + ' ч. ' + minutes + ' мин.';
+                    
+                    element.textContent = countdownText;
+                } else if (element) {
+                    element.textContent = 'Время истекло';
+                }
+                </text>
+            }
+        }
+        
+        // Обновляем каждую минуту
+        updateCountdowns();
+        setInterval(updateCountdowns, 60000);
+    </script>
+}

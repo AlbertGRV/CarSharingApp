@@ -3,268 +3,87 @@
     ViewData["Title"] = "Мои бронирования";
 }
 
-<div class="container py-4">
-    <div class="row">
-        <div class="col-md-12 mb-4">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Главная</a></li>
-                    <li class="breadcrumb-item"><a asp-action="Index">Личный кабинет</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Мои бронирования</li>
-                </ol>
-            </nav>
-        </div>
-    </div>
+<div class="container-fluid py-4">
+    <!-- Хлебные крошки -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Личный кабинет</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Мои бронирования</li>
+        </ol>
+    </nav>
 
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <i class="me-2">✅</i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Мои бронирования</h5>
-                    <a asp-controller="Cars" asp-action="Index" class="btn btn-light btn-sm">+ Новое бронирование</a>
-                </div>
-                <div class="card-body">
-                    <ul class="nav nav-tabs mb-3" id="bookingTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button" role="tab" aria-controls="active" aria-selected="true">Активные</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" type="button" role="tab" aria-controls="completed" aria-selected="false">Завершенные</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="cancelled-tab" data-bs-toggle="tab" data-bs-target="#cancelled" type="button" role="tab" aria-controls="cancelled" aria-selected="false">Отмененные</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" aria-controls="all" aria-selected="false">Все</button>
-                        </li>
-                    </ul>
-                    <div class="tab-content" id="bookingTabsContent">
-                        <!-- Активные бронирования -->
-                        <div class="tab-pane fade show active" id="active" role="tabpanel" aria-labelledby="active-tab">
-                            @{
-                                var activeBookings = Model.Where(b => b.EndDate >= DateTime.Now && b.Status != "Отменено").ToList();
-                            }
-                            @if (activeBookings.Any())
-                            {
-                                <div class="table-responsive">
-                                    <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Автомобиль</th>
-                                                <th>Начало</th>
-                                                <th>Окончание</th>
-                                                <th>Стоимость</th>
-                                                <th>Статус</th>
-                                                <th>Действия</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var booking in activeBookings)
-                                            {
-                                                <tr>
-                                                    <td>@booking.Car.Brand @booking.Car.Model</td>
-                                                    <td>@booking.StartDate.ToString("dd.MM.yyyy HH:mm")</td>
-                                                    <td>@booking.EndDate.ToString("dd.MM.yyyy HH:mm")</td>
-                                                    <td>@booking.TotalCost ₽</td>
-                                                    <td><span class="badge bg-success">Активно</span></td>
-                                                    <td>
-                                                        <div class="btn-group">
-                                                            <a asp-action="BookingDetails" asp-route-id="@booking.Id" class="btn btn-sm btn-outline-primary">Детали</a>
-                                                            @if (booking.StartDate > DateTime.Now)
-                                                            {
-                                                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal@(booking.Id)">Отменить</button>
-                                                            }
-                                                        </div>
-                                                    </td>
-                                                </tr>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="me-2">❌</i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
-                                                <!-- Модальное окно для отмены бронирования -->
-                                                <div class="modal fade" id="cancelModal@(booking.Id)" tabindex="-1" aria-labelledby="cancelModalLabel@(booking.Id)" aria-hidden="true">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title" id="cancelModalLabel@(booking.Id)">Подтверждение отмены</h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <p>Вы уверены, что хотите отменить бронирование автомобиля @booking.Car.Brand @booking.Car.Model?</p>
-                                                                <p><strong>Дата:</strong> @booking.StartDate.ToString("dd.MM.yyyy HH:mm") - @booking.EndDate.ToString("dd.MM.yyyy HH:mm")</p>
-                                                                <p><strong>Стоимость:</strong> @booking.TotalCost ₽</p>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                                                                <form asp-action="CancelBooking" asp-route-id="@booking.Id" method="post">
-                                                                    @Html.AntiForgeryToken()
-                                                                    <button type="submit" class="btn btn-danger">Подтвердить отмену</button>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="alert alert-info">
-                                    У вас нет активных бронирований
-                                </div>
-                            }
-                        </div>
+    <!-- Заголовок и кнопка -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>📋 Мои бронирования</h2>
+        <a asp-action="QuickBooking" class="btn btn-primary">
+            <i class="me-2">➕</i>Новое бронирование
+        </a>
+    </div>
 
-                        <!-- Завершенные бронирования -->
-                        <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
-                            @{
-                                var completedBookings = Model.Where(b => b.EndDate < DateTime.Now && b.Status != "Отменено").ToList();
-                            }
-                            @if (completedBookings.Any())
-                            {
-                                <div class="table-responsive">
-                                    <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Автомобиль</th>
-                                                <th>Дата</th>
-                                                <th>Продолжительность</th>
-                                                <th>Стоимость</th>
-                                                <th>Действия</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var booking in completedBookings)
-                                            {
-                                                <tr>
-                                                    <td>@booking.Car.Brand @booking.Car.Model</td>
-                                                    <td>@booking.StartDate.ToString("dd.MM.yyyy")</td>
-                                                    <td>@((booking.EndDate - booking.StartDate).TotalHours.ToString("F1")) ч</td>
-                                                    <td>@booking.TotalCost ₽</td>
-                                                    <td>
-                                                        <a asp-action="BookingDetails" asp-route-id="@booking.Id" class="btn btn-sm btn-outline-primary">Детали</a>
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="alert alert-info">
-                                    У вас нет завершенных бронирований
-                                </div>
-                            }
-                        </div>
+    <!-- Фильтры -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <ul class="nav nav-pills" id="bookingTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="all-tab" data-bs-toggle="pill" data-bs-target="#all" type="button" role="tab">
+                        Все (@Model.Count())
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="active-tab" data-bs-toggle="pill" data-bs-target="#active" type="button" role="tab">
+                        Активные (@Model.Count(b => b.Status == BookingStatus.Active))
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="completed-tab" data-bs-toggle="pill" data-bs-target="#completed" type="button" role="tab">
+                        Завершенные (@Model.Count(b => b.Status == BookingStatus.Completed))
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="cancelled-tab" data-bs-toggle="pill" data-bs-target="#cancelled" type="button" role="tab">
+                        Отмененные (@Model.Count(b => b.Status == BookingStatus.Cancelled))
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
 
-                        <!-- Отмененные бронирования -->
-                        <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="cancelled-tab">
-                            @{
-                                var cancelledBookings = Model.Where(b => b.Status == "Отменено").ToList();
-                            }
-                            @if (cancelledBookings.Any())
-                            {
-                                <div class="table-responsive">
-                                    <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Автомобиль</th>
-                                                <th>Дата бронирования</th>
-                                                <th>Дата отмены</th>
-                                                <th>Стоимость</th>
-                                                <th>Действия</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var booking in cancelledBookings)
-                                            {
-                                                <tr>
-                                                    <td>@booking.Car.Brand @booking.Car.Model</td>
-                                                    <td>@booking.StartDate.ToString("dd.MM.yyyy HH:mm")</td>
-                                                    <td>@booking.UpdatedAt.ToString("dd.MM.yyyy HH:mm")</td>
-                                                    <td>@booking.TotalCost ₽</td>
-                                                    <td>
-                                                        <a asp-action="BookingDetails" asp-route-id="@booking.Id" class="btn btn-sm btn-outline-primary">Детали</a>
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="alert alert-info">
-                                    У вас нет отмененных бронирований
-                                </div>
-                            }
-                        </div>
+    <!-- Содержимое вкладок -->
+    <div class="tab-content" id="bookingTabsContent">
+        <!-- Все бронирования -->
+        <div class="tab-pane fade show active" id="all" role="tabpanel">
+            @await Html.PartialAsync("_BookingsList", Model.OrderByDescending(b => b.CreatedAt))
+        </div>
 
-                        <!-- Все бронирования -->
-                        <div class="tab-pane fade" id="all" role="tabpanel" aria-labelledby="all-tab">
-                            @if (Model.Any())
-                            {
-                                <div class="table-responsive">
-                                    <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Автомобиль</th>
-                                                <th>Начало</th>
-                                                <th>Окончание</th>
-                                                <th>Стоимость</th>
-                                                <th>Статус</th>
-                                                <th>Действия</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var booking in Model.OrderByDescending(b => b.StartDate))
-                                            {
-                                                <tr>
-                                                    <td>@booking.Car.Brand @booking.Car.Model</td>
-                                                    <td>@booking.StartDate.ToString("dd.MM.yyyy HH:mm")</td>
-                                                    <td>@booking.EndDate.ToString("dd.MM.yyyy HH:mm")</td>
-                                                    <td>@booking.TotalCost ₽</td>
-                                                    <td>
-                                                        @if (booking.Status == "Отменено")
-                                                        {
-                                                            <span class="badge bg-danger">Отменено</span>
-                                                        }
-                                                        else if (booking.EndDate < DateTime.Now)
-                                                        {
-                                                            <span class="badge bg-secondary">Завершено</span>
-                                                        }
-                                                        else
-                                                        {
-                                                            <span class="badge bg-success">Активно</span>
-                                                        }
-                                                    </td>
-                                                    <td>
-                                                        <a asp-action="BookingDetails" asp-route-id="@booking.Id" class="btn btn-sm btn-outline-primary">Детали</a>
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="alert alert-info">
-                                    У вас нет бронирований
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Активные -->
+        <div class="tab-pane fade" id="active" role="tabpanel">
+            @await Html.PartialAsync("_BookingsList", Model.Where(b => b.Status == BookingStatus.Active).OrderBy(b => b.StartTime))
+        </div>
+
+        <!-- Завершенные -->
+        <div class="tab-pane fade" id="completed" role="tabpanel">
+            @await Html.PartialAsync("_BookingsList", Model.Where(b => b.Status == BookingStatus.Completed).OrderByDescending(b => b.EndTime))
+        </div>
+
+        <!-- Отмененные -->
+        <div class="tab-pane fade" id="cancelled" role="tabpanel">
+            @await Html.PartialAsync("_BookingsList", Model.Where(b => b.Status == BookingStatus.Cancelled).OrderByDescending(b => b.CreatedAt))
         </div>
     </div>
 </div>

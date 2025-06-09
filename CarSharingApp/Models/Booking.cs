@@ -12,10 +12,10 @@ namespace CarSharingApp.Models
         [Required]
         public int CarId { get; set; }
 
-        [Display(Name = "Дата начала")]
-        public DateTime StartTime { get; set; }
+        [Display(Name = "Время начала")]
+        public DateTime? StartTime { get; set; }
 
-        [Display(Name = "Дата окончания")]
+        [Display(Name = "Время окончания")]
         public DateTime? EndTime { get; set; }
 
         [Display(Name = "Планируемая продолжительность (минуты)")]
@@ -43,8 +43,15 @@ namespace CarSharingApp.Models
         [Display(Name = "Статус")]
         public BookingStatus Status { get; set; } = BookingStatus.Active;
 
+        [Display(Name = "Причина отмены")]
+        [StringLength(500)]
+        public string? CancellationReason { get; set; }
+
         [Display(Name = "Дата создания")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
+
+        [Display(Name = "Дата создания")]
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         [Display(Name = "Комментарий")]
         public string? Notes { get; set; }

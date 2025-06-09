@@ -28,7 +28,7 @@
                     (@activeBooking.Car.LicensePlate)
                 </p>
                 <p class="mb-2">
-                    <i class="bi bi-clock"></i> Начало: @activeBooking.StartTime.ToString("dd.MM.yyyy HH:mm")
+                    <i class="bi bi-clock"></i> Начало: @activeBooking.StartTime?.ToString("dd.MM.yyyy HH:mm")
                 </p>
                 <p class="mb-0">
                     <i class="bi bi-geo-alt"></i> @activeBooking.Car.Address
@@ -154,7 +154,7 @@
                                             <strong>@booking.Car.Brand @booking.Car.Model</strong><br>
                                             <small class="text-muted">@booking.Car.LicensePlate</small>
                                         </td>
-                                        <td>@booking.StartTime.ToString("dd.MM.yyyy")</td>
+                                        <td>@booking.StartTime?.ToString("dd.MM.yyyy")</td>
                                         <td>
                                             @if (booking.ActualDurationMinutes.HasValue)
                                             {

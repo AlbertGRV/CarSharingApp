@@ -88,7 +88,8 @@ namespace CarSharingApp.Controllers
 
             // Calculate trip details
             booking.EndTime = DateTime.Now;
-            booking.ActualDurationMinutes = (int)(booking.EndTime.Value - booking.StartTime).TotalMinutes;
+            booking.ActualDurationMinutes = (booking.EndTime.HasValue && booking.StartTime.HasValue) ?
+                             (int)((booking.EndTime.Value - booking.StartTime.Value).TotalMinutes) : 0;
             booking.EndMileage = endMileage;
             booking.EndFuelLevel = endFuelLevel;
             booking.TotalCost = booking.ActualDurationMinutes * booking.Car.PricePerMinute;

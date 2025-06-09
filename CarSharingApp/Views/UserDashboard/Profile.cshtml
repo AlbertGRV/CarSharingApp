@@ -3,112 +3,234 @@
     ViewData["Title"] = "Мой профиль";
 }
 
-<div class="container py-4">
-    <div class="row">
-        <div class="col-md-12 mb-4">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Главная</a></li>
-                    <li class="breadcrumb-item"><a asp-action="Index">Личный кабинет</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Мой профиль</li>
-                </ol>
-            </nav>
+<div class="container-fluid py-4">
+    <!-- Хлебные крошки -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Личный кабинет</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Мой профиль</li>
+        </ol>
+    </nav>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="me-2">✅</i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-    </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="me-2">❌</i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
     <div class="row">
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Профиль пользователя</h5>
+        <!-- Основная информация -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">👤 Личная информация</h5>
                 </div>
+                <div class="card-body">
+                    <form asp-action="UpdateProfile" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FirstName" class="form-label">Имя</label>
+                                <input asp-for="FirstName" class="form-control" placeholder="Введите ваше имя">
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LastName" class="form-label">Фамилия</label>
+                                <input asp-for="LastName" class="form-control" placeholder="Введите вашу фамилию">
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Email" class="form-label">Email</label>
+                                <input asp-for="Email" class="form-control" readonly>
+                                <div class="form-text">Email нельзя изменить. Обратитесь в поддержку для смены email.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="PhoneNumber" class="form-label">Телефон</label>
+                                <input asp-for="PhoneNumber" class="form-control" placeholder="+7 (999) 123-45-67">
+                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DateOfBirth" class="form-label">Дата рождения</label>
+                            <input asp-for="DateOfBirth" type="date" class="form-control">
+                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h6 class="mb-3">📍 Адрес</h6>
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label">Адрес</label>
+                            <input asp-for="Address" class="form-control" placeholder="Улица, дом, квартира">
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="City" class="form-label">Город</label>
+                                <input asp-for="City" class="form-control" placeholder="Москва">
+                                <span asp-validation-for="City" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label asp-for="PostalCode" class="form-label">Индекс</label>
+                                <input asp-for="PostalCode" class="form-control" placeholder="123456">
+                                <span asp-validation-for="PostalCode" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label asp-for="Country" class="form-label">Страна</label>
+                                <input asp-for="Country" class="form-control" placeholder="Россия">
+                                <span asp-validation-for="Country" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h6 class="mb-3">🚗 Водительские права</h6>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="DriverLicenseNumber" class="form-label">Номер ВУ</label>
+                                <input asp-for="DriverLicenseNumber" class="form-control" placeholder="1234 567890">
+                                <span asp-validation-for="DriverLicenseNumber" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="DriverLicenseIssueDate" class="form-label">Дата выдачи</label>
+                                <input asp-for="DriverLicenseIssueDate" type="date" class="form-control">
+                                <span asp-validation-for="DriverLicenseIssueDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="DriverLicenseExpiryDate" class="form-label">Дата окончания</label>
+                                <input asp-for="DriverLicenseExpiryDate" type="date" class="form-control">
+                                <span asp-validation-for="DriverLicenseExpiryDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="me-2">💾</i>Сохранить изменения
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="me-2">↩️</i>Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Боковая панель -->
+        <div class="col-lg-4">
+            <!-- Аватар -->
+            <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body text-center">
-                    <div class="display-1 mb-3">👤</div>
-                    <h3>@Model.UserName</h3>
+                    <div class="mb-3">
+                        <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center"
+                             style="width: 100px; height: 100px;">
+                            <span class="text-white" style="font-size: 2.5rem;">
+                                @((Model.FirstName ?? Model.UserName ?? "U").Substring(0, 1).ToUpper())
+                            </span>
+                        </div>
+                    </div>
+                    <h5>@(Model.FirstName + " " + Model.LastName)</h5>
                     <p class="text-muted">@Model.Email</p>
-                    <p>Дата регистрации: @Model.CreatedAt.ToString("dd.MM.yyyy")</p>
+                    <button class="btn btn-outline-primary btn-sm">
+                        <i class="me-2">📷</i>Изменить фото
+                    </button>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">Быстрые действия</h5>
+            <!-- Водительские права -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h6 class="mb-0">🚗 Водительские права</h6>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.DriverLicenseNumber))
+                    {
+                        <div class="mb-3">
+                            <small class="text-muted">Номер ВУ</small>
+                            <div class="fw-bold">@Model.DriverLicenseNumber</div>
+                        </div>
+                        @if (Model.DriverLicenseExpiryDate.HasValue)
+                        {
+                            <div class="mb-3">
+                                <small class="text-muted">Действительно до</small>
+                                <div class="fw-bold">@Model.DriverLicenseExpiryDate.Value.ToString("dd.MM.yyyy")</div>
+                            </div>
+                        }
+                        <div class="alert alert-success">
+                            <i class="me-2">✅</i>Права подтверждены
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <i class="me-2">⚠️</i>Добавьте данные водительских прав для бронирования
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Статистика -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h6 class="mb-0">📊 Статистика</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Дата регистрации:</span>
+                        <strong>@Model.CreatedAt.ToString("dd.MM.yyyy")</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Последний вход:</span>
+                        <strong>@(Model.LastLoginAt?.ToString("dd.MM.yyyy") ?? "Сегодня")</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Статус:</span>
+                        <span class="badge @(Model.IsActive ? "bg-success" : "bg-danger")">
+                            @(Model.IsActive ? "Активный" : "Заблокирован")
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Быстрые действия -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h6 class="mb-0">⚡ Действия</h6>
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-outline-primary">Настройки аккаунта</a>
-                        <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="btn btn-outline-primary">Изменить пароль</a>
-                        <a asp-action="Bookings" class="btn btn-outline-primary">Мои бронирования</a>
-                        <a asp-controller="Cars" asp-action="Index" class="btn btn-primary">Забронировать автомобиль</a>
+                        <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="btn btn-outline-primary btn-sm">
+                            <i class="me-2">🔒</i>Изменить пароль
+                        </a>
+                        <a asp-action="Settings" class="btn btn-outline-secondary btn-sm">
+                            <i class="me-2">⚙️</i>Настройки
+                        </a>
+                        <a asp-action="Notifications" class="btn btn-outline-info btn-sm">
+                            <i class="me-2">🔔</i>Уведомления
+                        </a>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-8">
-            <div class="card mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Личные данные</h5>
-                </div>
-                <div class="card-body">
-                    <form>
-                        <div class="mb-3">
-                            <label class="form-label">Имя пользователя</label>
-                            <input type="text" class="form-control" value="@Model.UserName" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" value="@Model.Email" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Номер телефона</label>
-                            <input type="tel" class="form-control" value="@Model.PhoneNumber" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Дата регистрации</label>
-                            <input type="text" class="form-control" value="@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")" readonly>
-                        </div>
-                        <div class="alert alert-info">
-                            Для изменения личных данных перейдите в <a asp-area="Identity" asp-page="/Account/Manage/Index">настройки аккаунта</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">Водительские данные</h5>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-warning">
-                        <strong>Внимание!</strong> Для бронирования автомобилей необходимо заполнить водительские данные.
-                    </div>
-                    <form>
-                        <div class="mb-3">
-                            <label class="form-label">Номер водительского удостоверения</label>
-                            <input type="text" class="form-control" placeholder="Введите номер ВУ">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Дата выдачи</label>
-                            <input type="date" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Срок действия</label>
-                            <input type="date" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Категории</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="categoryB">
-                                <label class="form-check-label" for="categoryB">B - Легковые автомобили</label>
-                            </div>
-                        </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-warning">Сохранить данные</button>
-                        </div>
-                    </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
